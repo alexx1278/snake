@@ -1,8 +1,9 @@
 # описание тут https://pythonist.ru/zmejka-na-python/
-'''Необходимые доработки:
+'''
+Необходимые доработки:
 3. Квадратики заменить картинками
 4. Лучший результат
-5. Супер еда'''
+'''
 
 import pygame
 import random
@@ -62,6 +63,8 @@ def gameLoop():
 
     snake_List = []
     Length_of_snake = 1
+    superFood = 0
+    dop_score = 0
 
     foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
     foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
@@ -73,7 +76,7 @@ def gameLoop():
             pygame.mixer.music.pause()
             message("Ты проиграл!", red, -15)
             message("Нажми С-чтобы играть сначала или Q-чтобы выйти", red, 15)
-            Your_score(Length_of_snake - 1)
+            Your_score(Length_of_snake + dop_score - 1)
             pygame.display.update()
 
             for event in pygame.event.get():
@@ -123,8 +126,17 @@ def gameLoop():
                 game_close = True
 
         our_snake(snake_block, snake_List)
-        Your_score(Length_of_snake - 1)
+        Your_score(Length_of_snake + dop_score - 1)
 
+        if superFood == 10:
+            if ras == 1:
+                superFoodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
+                superFoody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+                ras = 0
+            pygame.draw.rect(dis, red, (superFoodx, superFoody, snake_block, snake_block))
+            if x1 == superFoodx and y1 == superFoody:
+                superFood = 0
+                dop_score += 50
         pygame.display.update()
 
         if x1 == foodx and y1 == foody:
@@ -132,6 +144,10 @@ def gameLoop():
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
             sound1.play()
             Length_of_snake += 1
+            superFood += 1
+            if superFood >10:
+                superFood = 1
+            ras = 1
 
         clock.tick(snake_speed)
 
