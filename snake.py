@@ -1,8 +1,8 @@
 # описание тут https://pythonist.ru/zmejka-na-python/
 '''Необходимые доработки:
-1. Добавить звук фона.
-2. Добавить звук когда сьедает пищу.
-3. Квадратики заменить картинками'''
+3. Квадратики заменить картинками
+4. Лучший результат
+5. Супер еда'''
 
 import pygame
 import random
@@ -22,6 +22,11 @@ dis_height = 600
 dis = pygame.display.set_mode((dis_width, dis_height))
 pygame.display.set_caption('Игра Змейка, Даник учится')
 clock = pygame.time.Clock()
+pygame.mixer.music.load('./music/fount.mp3')
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play()
+
+sound1 = pygame.mixer.Sound('./music/am.mp3')
 
 snake_block = 10
 snake_speed = 10
@@ -65,6 +70,7 @@ def gameLoop():
 
         while game_close == True:
             dis.fill(blue)
+            pygame.mixer.music.pause()
             message("Ты проиграл!", red, -15)
             message("Нажми С-чтобы играть сначала или Q-чтобы выйти", red, 15)
             Your_score(Length_of_snake - 1)
@@ -79,6 +85,7 @@ def gameLoop():
                         game_over = True
                         game_close = False
                     if event.key == pygame.K_c:
+                        pygame.mixer.music.unpause()
                         gameLoop()
 
         for event in pygame.event.get():
@@ -123,6 +130,7 @@ def gameLoop():
         if x1 == foodx and y1 == foody:
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+            sound1.play()
             Length_of_snake += 1
 
         clock.tick(snake_speed)
