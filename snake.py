@@ -3,42 +3,21 @@
 Необходимые доработки:
 3. Квадратики заменить картинками
 4. Лучший результат
+6. Время существования супер еды и отображение этого времени
 '''
 
-import pygame
 import random
-
-pygame.init()
-
-white = (255, 255, 255)
-yellow = (255, 255, 102)
-black = (0, 0, 0)
-red = (213, 50, 80)
-green = (0, 255, 0)
-blue = (50, 153, 213)
-
-dis_width = 800
-dis_height = 600
-
-dis = pygame.display.set_mode((dis_width, dis_height))
-pygame.display.set_caption('Игра Змейка, Даник учится')
-clock = pygame.time.Clock()
-pygame.mixer.music.load('./music/fount.mp3')
-pygame.mixer.music.set_volume(0.3)
-pygame.mixer.music.play()
-
-sound1 = pygame.mixer.Sound('./music/am.mp3')
-
-snake_block = 10
-snake_speed = 10
-
-font_style = pygame.font.SysFont("bahnschrift", 25)
-score_font = pygame.font.SysFont("comicsansms", 35)
+import time
+from settings import *
 
 
 def Your_score(score):
     value = score_font.render("Очки: " + str(score), True, yellow)
     dis.blit(value, [0, 0])
+
+def Top_score(score):
+    value = score_font.render("Лучший результат: " + str(score), True, yellow)
+    dis.blit(value, [400, 0])
 
 
 def our_snake(snake_block, snake_list):
@@ -51,7 +30,7 @@ def message(msg, color, poz):
     dis.blit(mesg, [(dis_width / 6) , (dis_height / 3) + poz])
 
 
-def gameLoop():
+def gameLoop(top_score):
     game_over = False
     game_close = False
 
@@ -67,18 +46,27 @@ def gameLoop():
     dop_score = 0
 
     foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-    foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+    foody = round(random.randrange(20, dis_height - snake_block) / 10.0) * 10.0
 
     while not game_over:
 
         while game_close == True:
             dis.fill(blue)
             pygame.mixer.music.pause()
+            Your_score(Length_of_snake + dop_score - 1)
+            Top_score(top_score)
+            score = Length_of_snake + dop_score - 1
+            if score > top_score:
+                top_score = score
+                f = open('top_skore', 'w')
+                f.write(str(top_score))
+                f.close()
+                message(f"Ты побил рекорд! Новый рекорд: {top_score}", red, 0)
+                pygame.display.update()
+                time.sleep(5)
             message("Ты проиграл!", red, -15)
             message("Нажми С-чтобы играть сначала или Q-чтобы выйти", red, 15)
-            Your_score(Length_of_snake + dop_score - 1)
             pygame.display.update()
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     game_over = True
@@ -107,7 +95,6 @@ def gameLoop():
                 elif event.key == pygame.K_DOWN:
                     y1_change = snake_block
                     x1_change = 0
-
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
             game_close = True
         x1 += x1_change
@@ -127,21 +114,22 @@ def gameLoop():
 
         our_snake(snake_block, snake_List)
         Your_score(Length_of_snake + dop_score - 1)
-
+        Top_score(top_score)
         if superFood == 10:
             if ras == 1:
                 superFoodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-                superFoody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+                superFoody = round(random.randrange(20, dis_height - snake_block) / 10.0) * 10.0
                 ras = 0
             pygame.draw.rect(dis, red, (superFoodx, superFoody, snake_block, snake_block))
             if x1 == superFoodx and y1 == superFoody:
+                sound1.play()
                 superFood = 0
                 dop_score += 50
         pygame.display.update()
 
         if x1 == foodx and y1 == foody:
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-            foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+            foody = round(random.randrange(20, dis_height - snake_block) / 10.0) * 10.0
             sound1.play()
             Length_of_snake += 1
             superFood += 1
@@ -155,4 +143,4 @@ def gameLoop():
     quit()
 
 
-gameLoop()
+gameLoop(top_score)
