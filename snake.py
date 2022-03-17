@@ -2,8 +2,7 @@
 '''
 Необходимые доработки:
 3. Квадратики заменить картинками
-4. Лучший результат
-6. Время существования супер еды и отображение этого времени
+7. Реализовать паузу
 '''
 
 import random
@@ -18,6 +17,11 @@ def Your_score(score):
 def Top_score(score):
     value = score_font.render("Лучший результат: " + str(score), True, yellow)
     dis.blit(value, [400, 0])
+
+
+def messagetime(sec):
+    value = score_font.render("Осталось времени: " + str(sec), True, yellow)
+    dis.blit(value, [0, 570])
 
 
 def our_snake(snake_block, snake_list):
@@ -77,8 +81,7 @@ def gameLoop(top_score):
                         game_close = False
                     if event.key == pygame.K_c:
                         pygame.mixer.music.unpause()
-                        gameLoop()
-
+                        gameLoop(top_score)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
@@ -115,11 +118,18 @@ def gameLoop(top_score):
         our_snake(snake_block, snake_List)
         Your_score(Length_of_snake + dop_score - 1)
         Top_score(top_score)
-        if superFood == 10:
+        if superFood >= 10:
             if ras == 1:
+                start_time = time.time() + 20
                 superFoodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-                superFoody = round(random.randrange(20, dis_height - snake_block) / 10.0) * 10.0
+                superFoody = round(random.randrange(20, dis_height - snake_block - 30) / 10.0) * 10.0
                 ras = 0
+            if (start_time - time.time()) >= 0:
+                sec = int(start_time - time.time())
+                messagetime(sec)
+            if sec <= 0:
+                superFood = 0
+
             pygame.draw.rect(dis, red, (superFoodx, superFoody, snake_block, snake_block))
             if x1 == superFoodx and y1 == superFoody:
                 sound1.play()
@@ -129,12 +139,10 @@ def gameLoop(top_score):
 
         if x1 == foodx and y1 == foody:
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-            foody = round(random.randrange(20, dis_height - snake_block) / 10.0) * 10.0
+            foody = round(random.randrange(20, dis_height - snake_block - 30) / 10.0) * 10.0
             sound1.play()
             Length_of_snake += 1
             superFood += 1
-            if superFood >10:
-                superFood = 1
             ras = 1
 
         clock.tick(snake_speed)
